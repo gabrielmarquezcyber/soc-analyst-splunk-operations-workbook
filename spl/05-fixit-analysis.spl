@@ -1,0 +1,36 @@
+# SOC Analyst Splunk Operations Workbook
+# Section 05 - Applied Parsing Fix and Network Log Analysis
+
+# Validate network_logs custom field extraction
+index=main sourcetype=network_logs source=networks earliest=-5m
+| table _time Username Department Domain URI SourceIP Country _raw host source sourcetype
+
+# Final network analysis summary query
+index=main sourcetype=network_logs source=networks earliest=-10m
+| eval IPRange=case(
+    cidrmatch("10.0.0.0/8", SourceIP), "10.0.0.0/8",
+    cidrmatch("172.16.0.0/12", SourceIP), "172.16.0.0/12",
+    cidrmatch("192.168.0.0/16", SourceIP), "192.168.0.0/16",
+    true(), "Other"
+)
+| eventstats count as user_event_count by Username
+| eventstats max(user_event_count) as max_user_event_count
+| eval most_active_user=if(user_event_count=max_user_event_count, Username, null())
+| stats
+    values(Domain) as Domain
+    dc(Username) as Username_values
+    dc(URI) as URI_values
+    dc(eval(if(like(URI,"/products/%"), URI, null()))) as individual_products_pages
+    values(eval(if(NOT match(URI,"\.[A-Za-z0-9]+$"), URI, null()))) as URI_without_file_extension
+    values(most_active_user) as most_active_User
+    dc(IPRange) as unique_IP_ranges
+    values(eval(if(URI="/secret-document.pdf", Username, null()))) as secret_document_User
+
+# Room-aligned private IP range grouping
+index=main sourcetype=network_logs source=networks
+| eval IPRange=case(
+    like(SourceIP,"10.%"), "10.x.x.x",
+    like(SourceIP,"172.16.%"), "172.16.x.x",
+    like(SourceIP,"192.168.%"), "192.168.x.x"
+)
+| stats count by IPRange

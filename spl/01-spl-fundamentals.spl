@@ -1,0 +1,94 @@
+# SOC Analyst Splunk Operations Workbook
+# Section 01 - SPL Fundamentals and Detection Queries
+
+# Base dataset validation
+index=windowslogs
+| stats count
+
+# Source IP frequency analysis
+index=windowslogs SourceIp=*
+| stats count by SourceIp
+| sort - count
+| head 5
+
+# Time-bounded event count
+index=windowslogs earliest="08/25/2022:08:00:00" latest="08/25/2022:08:01:00"
+| stats count
+
+# Windows successful-logon EventID filtering
+index=windowslogs EventID=4624
+| stats count
+
+# Destination IP and port filtering
+index=windowslogs DestinationIp=172.18.39.6 DestinationPort=135
+| stats count
+
+# Host, destination, and source IP pivot
+index=windowslogs Hostname=Salena.Adam DestinationIp=172.18.38.5 SourceIp=*
+| stats count by SourceIp
+| sort - count
+| head 5
+
+# Wildcard keyword search
+index=windowslogs cyber*
+| stats count
+
+# Field selection and process ID review
+index=windowslogs
+| fields Domain SourceProcessId TargetProcessId
+
+# Regex filtering for TargetObject ending in Manager
+index=windowslogs
+| regex TargetObject="Manager$"
+| stats count by TargetObject
+| sort - count
+| head 5
+
+# Analyst-readable account table
+index=windowslogs
+| table _time EventID AccountName AccountType
+
+# Oldest-to-newest account event timeline
+index=windowslogs
+| table _time EventID AccountName AccountType
+| reverse
+
+# Process creation timeline reconstruction
+index=windowslogs EventID=1
+| table _time ParentProcessId ProcessId ParentCommandLine CommandLine
+| reverse
+
+# Process image frequency analysis
+index=windowslogs Image=*
+| top limit=5 Image
+
+# IP geolocation enrichment
+index=windowslogs SourceIp=*
+| iplocation SourceIp
+| stats count by Country Region
+| sort - count
+
+# Lookup-based process image risk enrichment
+index=windowslogs
+| lookup image_riskscore Image OUTPUT RiskScore
+| stats count by Image RiskScore
+| sort - RiskScore
+
+# Rare VPN country outlier detection
+index=vpnlogs
+| eventstats count as logins_by_user by user
+| eventstats count as logins_by_user_country by user src_country
+| eval country_freq=logins_by_user_country/logins_by_user
+| where country_freq < 0.1
+| table _time user src_ip src_country country_freq
+
+# Login-hour z-score anomaly detection
+index=vpnlogs
+| eval hour=tonumber(strftime(_time, "%H")) + tonumber(strftime(_time, "%M"))/60
+| eventstats avg(hour) as typical_hour stdev(hour) as stdev_hour by user
+| eval zscore=abs(hour - typical_hour) / stdev_hour
+| where zscore > 3
+| eval hour=round(hour, 2), typical_hour=round(typical_hour, 2)
+| eval stdev_hour=round(stdev_hour, 2), zscore=round(zscore, 2)
+| table _time user src_ip src_country hour typical_hour stdev_hour zscore
+| sort - zscore

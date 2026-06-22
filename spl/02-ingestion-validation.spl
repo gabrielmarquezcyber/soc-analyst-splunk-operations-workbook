@@ -1,0 +1,27 @@
+# SOC Analyst Splunk Operations Workbook
+# Section 02 - Splunk Lab Deployment and Log Ingestion
+
+# Validate Linux auth log ingestion
+index=linux_host source="/var/log/auth.log"
+| stats count by sourcetype source host
+
+# Validate analyst user creation activity
+index=linux_host analyst
+| table _time source sourcetype process _raw
+
+# Validate Apache access log ingestion
+index=web source="/var/log/apache2/access.log" host=coffelyweb sourcetype=access_combined
+| stats count by index host source sourcetype
+
+# Review web root field frequency
+index=web source="/var/log/apache2/access.log"
+| stats count by root
+| sort - count
+
+# Locate a specific web resource
+index=web source="/var/log/apache2/access.log" uri_path="/images/coffeerecipes/cappuchino.png"
+| table _time host source sourcetype uri_path status
+
+# Validate access to a sensitive-looking path without exposing flag content
+index=web source="/var/log/apache2/access.log" uri_path="/secret-flag.html"
+| table _time host source sourcetype uri_path status

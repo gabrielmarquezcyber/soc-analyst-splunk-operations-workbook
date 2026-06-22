@@ -1,0 +1,29 @@
+# SOC Analyst Splunk Operations Workbook
+# Section 04 - Data Parsing, Normalization, and Field Extraction
+
+# Validate DataApp sample scripted input
+index=main sourcetype=testing source="/opt/splunk/etc/apps/DataApp/bin/samplelogs.py" host=test
+
+# Validate vpn_logs event boundary repair
+index=main sourcetype=vpn_logs source="/opt/splunk/etc/apps/DataApp/bin/vpnlogs" host=vpn_server earliest=-2m
+| table _time _raw linecount host source sourcetype
+
+# Validate auth_logs multiline parsing
+index=main sourcetype=auth_logs source="/opt/splunk/etc/apps/DataApp/bin/authentication_logs" host=auth_server earliest=-2m
+| table _time _raw linecount host source sourcetype
+
+# Validate purchase_logs masking
+index=main sourcetype=purchase_logs source="/opt/splunk/etc/apps/DataApp/bin/purchase-details" host=order_server earliest=-2m
+| table _time _raw host source sourcetype
+
+# Validate VPN custom field extraction
+index=main sourcetype=vpn_logs host=vpn_server earliest=-2m
+| table _time User Server Action _raw host source sourcetype
+
+# Validate purchase custom field extraction with masked CC_Number
+index=main sourcetype=purchase_logs host=order_server earliest=-2m
+| table _time User CC_Number _raw host source sourcetype
+
+# Validate extracted purchase fields are useful for aggregation
+index=main sourcetype=purchase_logs host=order_server earliest=-5m
+| stats dc(User) as unique_User_values dc(CC_Number) as unique_masked_CC_Number_values
