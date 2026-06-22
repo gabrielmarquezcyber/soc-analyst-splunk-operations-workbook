@@ -1,122 +1,121 @@
-# Section 05 - Applied Splunk Parsing Fix and Network Log Analysis
+# Section 05 - Applied Parsing Fix and Network Log Analysis
 
 [Previous](./04-data-parsing-normalization-and-field-extraction.md) | [README](../README.md) | [Proof Map](../reviewer-proof-map.md) | [Docs Index](README.md) | Next
 
 ## Purpose
 
-This section documents an applied parsing repair workflow for broken network-log data. The goal is to show how an analyst can diagnose unusable events, repair parsing with Splunk configuration, extract custom fields, validate the result, and then answer investigation questions from structured data.
+This section applies the Splunk parsing workflow to broken network-log data. The goal is to turn poorly structured raw events into analyst-ready fields that support investigation questions.
 
-This section ties together the previous workbook skills:
+The main proof is the full chain: identify broken events, repair event boundaries, extract fields, register fields, validate searchability, and use the corrected data for network activity analysis.
 
-1. Inspect broken events.
-2. Identify the correct app and scripted-input path.
-3. Repair event boundaries.
-4. Extract fields from raw network-log text.
-5. Register indexed fields.
-6. Validate field extraction in Splunk search.
-7. Use SPL to produce an analyst-ready network activity summary.
+## Visual Walkthrough
 
-## Analyst Workflow
+### 1. Broken network events are identified
 
-The workflow follows a realistic parsing and investigation path:
+The workflow starts with network events that are not properly separated or fielded. In this state, the data is difficult to investigate because important values are trapped in raw text.
 
-1. Review the broken network events.
-2. Confirm the Splunk app path.
-3. Confirm the scripted-input path.
-4. Update `inputs.conf` for the network log source.
-5. Repair event boundaries in `props.conf`.
-6. Define field extraction in `transforms.conf`.
-7. Register extracted fields in `fields.conf`.
-8. Validate that `Username`, `Department`, `Domain`, `URI`, `SourceIP`, and `Country` are searchable.
-9. Run summary analysis against the repaired dataset.
+<img src="../screenshots/05-splunk-fixit-challenge/task-02-fixit-challenge/68-splunk-fixit-initial-broken-events.png" alt="Initial broken network log events in Splunk" width="850">
 
-## Skills Demonstrated
+Reviewer takeaway: this shows the starting problem. The analyst cannot trust downstream searches until event structure is repaired.
 
-| Skill | SOC value |
+### 2. The scripted input is reviewed
+
+The network log source is defined through an app-scoped scripted input. This establishes where the data is coming from and how Splunk is ingesting it.
+
+<img src="../screenshots/05-splunk-fixit-challenge/task-02-fixit-challenge/69-splunk-fixit-app-inputs-conf-network-logs.png" alt="Fixit app inputs.conf network log scripted input" width="850">
+
+Reviewer takeaway: this shows the ingestion path before the parsing repair is applied.
+
+### 3. Event boundaries are repaired in props.conf
+
+The parsing repair begins with event-boundary logic. This tells Splunk where each network event should begin so the raw log stream becomes searchable event records.
+
+<img src="../screenshots/05-splunk-fixit-challenge/task-02-fixit-challenge/70-splunk-fixit-props-conf-event-boundary-fix.png" alt="Network log event boundary repair in props.conf" width="850">
+
+Reviewer takeaway: this demonstrates Splunk parsing configuration, not just SPL search usage.
+
+### 4. Custom fields are extracted from the network logs
+
+After event boundaries are corrected, the next step is extracting useful analyst fields from the raw event text.
+
+The custom field extraction maps user, department, domain, URI, source IP, and country values.
+
+<img src="../screenshots/05-splunk-fixit-challenge/task-02-fixit-challenge/71-splunk-fixit-transforms-conf-custom-fields.png" alt="Network log custom field extraction in transforms.conf" width="850">
+
+The transform is connected to the network log sourcetype in `props.conf`.
+
+<img src="../screenshots/05-splunk-fixit-challenge/task-02-fixit-challenge/72-splunk-fixit-props-conf-transforms-reference.png" alt="Network log props.conf transform reference" width="850">
+
+The extracted fields are registered in `fields.conf`.
+
+<img src="../screenshots/05-splunk-fixit-challenge/task-02-fixit-challenge/73-splunk-fixit-fields-conf-indexed-fields.png" alt="Network log fields.conf indexed field registration" width="850">
+
+Reviewer takeaway: this shows the complete field-extraction configuration path: define transform, attach transform, register fields.
+
+### 5. The repaired fields are validated in Splunk
+
+The corrected field extraction is validated directly in Splunk search. This proves the parsing repair worked and that the extracted fields are usable for analyst investigation.
+
+<img src="../screenshots/05-splunk-fixit-challenge/task-02-fixit-challenge/74-splunk-fixit-fixed-field-extraction-validation.png" alt="Fixed network log field extraction validation in Splunk" width="850">
+
+Reviewer takeaway: this is the validation point. The data has moved from raw text to searchable fields.
+
+### 6. The corrected data supports network analysis
+
+The final result is a structured analysis summary using the repaired network-log fields. This turns the parsing work into investigation output.
+
+<img src="../screenshots/05-splunk-fixit-challenge/task-02-fixit-challenge/75-splunk-fixit-network-analysis-summary.png" alt="Network log analysis summary in Splunk" width="850">
+
+Reviewer takeaway: this shows the operational value of the parsing repair. The fixed data can now answer investigation questions about users, domains, URIs, source IP ranges, and sensitive-looking document access.
+
+## Supporting Files
+
+| File | Why it matters |
 |---|---|
-| Broken event review | Identifies why raw data is not analyst-ready. |
-| Scripted-input validation | Confirms where custom logs enter Splunk. |
-| Event boundary repair | Prevents unrelated network records from merging together. |
-| Regex-based field extraction | Turns raw text into structured investigation fields. |
-| Indexed field registration | Supports faster pivots on important extracted values. |
-| Field validation search | Confirms that parsing changes worked before analysis. |
-| Network activity aggregation | Produces summary values from repaired data. |
-| Private IP range grouping | Supports source IP family analysis. |
-| Sensitive document access review | Identifies user activity tied to a sensitive-looking URI. |
+| [Fixit inputs.conf](../configs/fixit/inputs.conf) | Defines the scripted input for the network log source. |
+| [Fixit props.conf](../configs/fixit/props.conf) | Defines event-boundary repair and transform attachment. |
+| [Fixit transforms.conf](../configs/fixit/transforms.conf) | Defines field extraction for network-log values. |
+| [Fixit fields.conf](../configs/fixit/fields.conf) | Registers extracted fields for indexed field behavior. |
+| [Section 05 SPL analysis](../spl/05-fixit-analysis.spl) | Contains the validation and final network-analysis searches. |
 
-## Configuration Files
+## Complete Evidence Reference
 
-| File | Purpose |
-|---|---|
-| [configs/fixit/inputs.conf](../configs/fixit/inputs.conf) | Defines the scripted input for the network log source. |
-| [configs/fixit/props.conf](../configs/fixit/props.conf) | Defines event boundary handling and transform reference for `network_logs`. |
-| [configs/fixit/transforms.conf](../configs/fixit/transforms.conf) | Extracts `Username`, `Department`, `Domain`, `URI`, `SourceIP`, and `Country`. |
-| [configs/fixit/fields.conf](../configs/fixit/fields.conf) | Registers extracted network fields as indexed fields. |
-
-## Evidence Map
+The screenshots embedded above are the most important reviewer-facing proof. The complete evidence set is listed below for full traceability.
 
 | Screenshot | What it proves |
 |---|---|
-| [68-splunk-fixit-initial-broken-events.png](../screenshots/05-splunk-fixit-challenge/task-02-fixit-challenge/68-splunk-fixit-initial-broken-events.png) | Captured the initial broken network events before parsing repair. |
-| [69-splunk-fixit-app-inputs-conf-network-logs.png](../screenshots/05-splunk-fixit-challenge/task-02-fixit-challenge/69-splunk-fixit-app-inputs-conf-network-logs.png) | Confirmed the network log scripted-input configuration. |
-| [70-splunk-fixit-props-conf-event-boundary-fix.png](../screenshots/05-splunk-fixit-challenge/task-02-fixit-challenge/70-splunk-fixit-props-conf-event-boundary-fix.png) | Added event boundary repair using `BREAK_ONLY_BEFORE`. |
-| [71-splunk-fixit-transforms-conf-custom-fields.png](../screenshots/05-splunk-fixit-challenge/task-02-fixit-challenge/71-splunk-fixit-transforms-conf-custom-fields.png) | Defined custom field extraction for network log values. |
-| [72-splunk-fixit-props-conf-transforms-reference.png](../screenshots/05-splunk-fixit-challenge/task-02-fixit-challenge/72-splunk-fixit-props-conf-transforms-reference.png) | Referenced the field extraction transform from `props.conf`. |
-| [73-splunk-fixit-fields-conf-indexed-fields.png](../screenshots/05-splunk-fixit-challenge/task-02-fixit-challenge/73-splunk-fixit-fields-conf-indexed-fields.png) | Registered extracted network fields in `fields.conf`. |
-| [74-splunk-fixit-fixed-field-extraction-validation.png](../screenshots/05-splunk-fixit-challenge/task-02-fixit-challenge/74-splunk-fixit-fixed-field-extraction-validation.png) | Validated that extracted fields appeared in Splunk search results. |
-| [75-splunk-fixit-network-analysis-summary.png](../screenshots/05-splunk-fixit-challenge/task-02-fixit-challenge/75-splunk-fixit-network-analysis-summary.png) | Produced the final structured network analysis summary. |
-
-## Key Technical Details
-
-| Item | Value |
-|---|---|
-| App path | `/opt/splunk/etc/apps/fixit` |
-| Script path | `/opt/splunk/etc/apps/fixit/bin/network-logs` |
-| Source | `networks` |
-| Sourcetype | `network_logs` |
-| Event boundary setting | `BREAK_ONLY_BEFORE` |
-| Event boundary regex | `\[Network-log\]:` |
-| Extracted fields | `Username`, `Department`, `Domain`, `URI`, `SourceIP`, `Country` |
+| [68 - Initial broken events](../screenshots/05-splunk-fixit-challenge/task-02-fixit-challenge/68-splunk-fixit-initial-broken-events.png) | Network events were malformed before parsing repair. |
+| [69 - Network log scripted input](../screenshots/05-splunk-fixit-challenge/task-02-fixit-challenge/69-splunk-fixit-app-inputs-conf-network-logs.png) | Scripted input was configured for the network log source. |
+| [70 - Event boundary fix](../screenshots/05-splunk-fixit-challenge/task-02-fixit-challenge/70-splunk-fixit-props-conf-event-boundary-fix.png) | Event-boundary repair was configured in props.conf. |
+| [71 - Custom fields transform](../screenshots/05-splunk-fixit-challenge/task-02-fixit-challenge/71-splunk-fixit-transforms-conf-custom-fields.png) | Network-log field extraction was defined in transforms.conf. |
+| [72 - Props transform reference](../screenshots/05-splunk-fixit-challenge/task-02-fixit-challenge/72-splunk-fixit-props-conf-transforms-reference.png) | The transform was attached to the network log sourcetype. |
+| [73 - Indexed field registration](../screenshots/05-splunk-fixit-challenge/task-02-fixit-challenge/73-splunk-fixit-fields-conf-indexed-fields.png) | Extracted fields were registered in fields.conf. |
+| [74 - Field extraction validation](../screenshots/05-splunk-fixit-challenge/task-02-fixit-challenge/74-splunk-fixit-fixed-field-extraction-validation.png) | Corrected fields were validated in Splunk search. |
+| [75 - Network analysis summary](../screenshots/05-splunk-fixit-challenge/task-02-fixit-challenge/75-splunk-fixit-network-analysis-summary.png) | Repaired fields supported final network-log analysis. |
 
 ## Validated Analysis Results
 
-| Investigation question | Validated result |
+The repaired network-log data supported the following investigation outputs:
+
+| Result | Value |
 |---|---|
-| Primary domain observed | `Cybertees.THM` |
-| Unique username values | `28` |
-| Unique URI values | `12` |
-| Individual `/products/` pages | `2` |
-| URI without a file extension | `/sales/` |
-| Most active user | `Robert Wilson` |
-| Unique private IP range families | `3` |
-| User associated with `/secret-document.pdf` | `Sarah Hall` |
+| Domain identified | Cybertees.THM |
+| Username values | 28 |
+| URI values | 12 |
+| Individual product pages | 2 |
+| URI without file extension | /sales/ |
+| Most active user | Robert Wilson |
+| Unique private IP ranges | 3 |
+| Sensitive-looking document access user | Sarah Hall |
 
-## Parsing Lessons
+## Reviewer Takeaway
 
-The important lesson is that the data was not missing. It was poorly structured.
+This section shows applied Splunk repair work under investigation conditions. The analyst starts with broken network logs, fixes parsing, extracts fields, validates the fields, and then uses those fields to produce a structured network analysis.
 
-Before the repair, the logs were difficult to analyze because event boundaries and fields were not usable. After the repair, the same raw data could support direct questions about domains, users, URIs, IP ranges, and sensitive-looking document access.
+The completed workflow demonstrates a practical SOC skill chain:
 
-The practical sequence is:
-
-- Fix event boundaries first.
-- Extract fields second.
-- Register fields third.
-- Validate fields fourth.
-- Analyze only after the data is trustworthy.
-
-## Analyst Notes
-
-This section is a useful SOC proof point because it shows the difference between searching raw logs and operationalizing raw logs.
-
-A strong analyst does not only write searches. They also validate whether the data model, sourcetype, event boundaries, and field extractions are usable. Bad parsing creates bad analysis, even when the original log source contains the right evidence.
-
-## Public Safety Note
-
-The published evidence avoids credentials and private secrets. Sensitive-looking paths are treated as investigation artifacts, not as content to expose.
-
-## Related SPL
-
-See:
-
-[05-fixit-analysis.spl](../spl/05-fixit-analysis.spl)
+1. Diagnose broken event structure.
+2. Repair parsing in Splunk configuration.
+3. Extract analyst-useful fields.
+4. Validate fields with SPL.
+5. Use corrected data for investigation output.

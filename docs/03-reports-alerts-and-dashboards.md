@@ -4,85 +4,100 @@
 
 ## Purpose
 
-This section documents how recurring SOC questions can be converted into reusable Splunk reports, alert-candidate SPL, and dashboard panels.
+This section documents how recurring Splunk searches can become reusable analyst assets.
 
-The focus is not only on creating visuals. The goal is to show how an analyst turns repeatable investigation needs into searches and panels that support faster review.
+The goal is to show the progression from one-time searches into reports, alert-candidate logic, and dashboard panels that support repeatable SOC review.
 
-## Analyst Workflow
+## Visual Walkthrough
 
-This section follows a practical SOC reporting path:
+### 1. VPN activity becomes a reusable report
 
-1. Build a recurring VPN login report.
-2. Save the report for repeated review.
-3. Analyze web connections by source IP.
-4. Build alert-candidate SPL for restricted-page access.
-5. Count HTTP 404 responses for a payment-related page.
-6. Create hourly threshold logic for 404 spikes.
-7. Build dashboard panels for URI, status code, and source activity review.
+The workflow starts by turning VPN login activity into a report-oriented search.
 
-## Skills Demonstrated
+<img src="../screenshots/03-splunk-dashboards-and-reports/task-02-reports/34-splunk-vpn-logins-by-username-report-search.png" alt="VPN logins by username report search in Splunk" width="850">
 
-| Skill | SOC value |
+The report view makes the result reusable instead of leaving it as a one-time investigation query.
+
+<img src="../screenshots/03-splunk-dashboards-and-reports/task-02-reports/35-splunk-vpn-logins-by-username-report-view.png" alt="VPN logins by username report view in Splunk" width="850">
+
+Reviewer takeaway: this shows how recurring access-review questions can be turned into saved reporting views.
+
+### 2. Web activity is summarized for recurring review
+
+Web connections are summarized by source IP so repeated access patterns can be reviewed quickly.
+
+<img src="../screenshots/03-splunk-dashboards-and-reports/task-02-reports/36-splunk-web-connections-by-source-ip-report.png" alt="Web connections by source IP report in Splunk" width="850">
+
+Reviewer takeaway: this shows report creation for web activity, not just raw search inspection.
+
+### 3. Alert-candidate logic focuses on restricted access
+
+The workbook documents alert-candidate SPL for external access to a restricted page. This is framed as detection logic that could support alerting without overstating production alert deployment.
+
+<img src="../screenshots/03-splunk-dashboards-and-reports/task-03-alerts/37-splunk-alert-restricted-page-external-sourceip-detection.png" alt="Restricted page external source IP detection logic in Splunk" width="850">
+
+Reviewer takeaway: this shows detection thinking: define the condition, constrain the event set, and produce a reviewable signal.
+
+### 4. Error activity is counted and thresholded
+
+The workflow also reviews HTTP 404 activity. First, total 404 activity is counted.
+
+<img src="../screenshots/03-splunk-dashboards-and-reports/task-03-alerts/38-splunk-payments-404-total-count.png" alt="Total 404 response count in Splunk" width="850">
+
+Then hourly 404 activity is shaped into threshold-style alert-candidate logic.
+
+<img src="../screenshots/03-splunk-dashboards-and-reports/task-03-alerts/39-splunk-payments-404-hourly-threshold-rule.png" alt="Hourly 404 threshold rule in Splunk" width="850">
+
+Reviewer takeaway: this shows how an analyst can move from counting error activity to shaping logic for recurring threshold review.
+
+### 5. Dashboard panels turn searches into review surfaces
+
+Dashboards help convert repeated search patterns into a visual surface for recurring analyst review.
+
+A URI pie chart panel summarizes web request distribution.
+
+<img src="../screenshots/03-splunk-dashboards-and-reports/task-04-dashboards/40-splunk-dashboard-uri-pie-chart-panel.png" alt="URI pie chart dashboard panel in Splunk" width="850">
+
+A restricted status-code table gives a focused view of restricted-path response behavior.
+
+<img src="../screenshots/03-splunk-dashboards-and-reports/task-04-dashboards/41-splunk-dashboard-restricted-status-code-table.png" alt="Restricted status code dashboard table in Splunk" width="850">
+
+A source IP, URI, and status-code table supports repeated review of web access activity.
+
+<img src="../screenshots/03-splunk-dashboards-and-reports/task-04-dashboards/42-splunk-dashboard-sourceip-uri-statuscode-table.png" alt="Source IP URI status code dashboard table in Splunk" width="850">
+
+Reviewer takeaway: this shows that the analyst can turn SPL into dashboard views that are easier for reviewers and operators to consume.
+
+## Supporting Files
+
+| File | Why it matters |
 |---|---|
-| Saved report creation | Turns repeated searches into reusable review assets. |
-| Source IP aggregation | Identifies high-volume web clients and investigation pivots. |
-| Alert-candidate SPL | Documents detection logic without overclaiming full alert deployment. |
-| Private IP filtering | Separates internal and external source activity. |
-| HTTP status analysis | Supports web troubleshooting, access review, and anomaly detection. |
-| Threshold-style aggregation | Builds the foundation for alert tuning and baseline review. |
-| Dashboard panel design | Converts raw search results into readable analyst views. |
-| Panel title hygiene | Makes dashboards easier to interpret during recurring SOC review. |
+| [Section 03 SPL](../spl/03-reports-alerts-dashboards.spl) | Contains the report searches, alert-candidate searches, and dashboard panel searches used in this section. |
 
-## Evidence Map
+## Complete Evidence Reference
+
+The screenshots embedded above are the most important reviewer-facing proof. The complete evidence set is listed below for full traceability.
 
 | Screenshot | What it proves |
 |---|---|
-| [34-splunk-vpn-logins-by-username-report-search.png](../screenshots/03-splunk-dashboards-and-reports/task-02-reports/34-splunk-vpn-logins-by-username-report-search.png) | Built a reusable VPN login count search by Username. |
-| [35-splunk-vpn-logins-by-username-report-view.png](../screenshots/03-splunk-dashboards-and-reports/task-02-reports/35-splunk-vpn-logins-by-username-report-view.png) | Saved the VPN login search as a reusable Splunk report. |
-| [36-splunk-web-connections-by-source-ip-report.png](../screenshots/03-splunk-dashboards-and-reports/task-02-reports/36-splunk-web-connections-by-source-ip-report.png) | Reviewed web connections by Source_IP and identified high-volume source activity. |
-| [37-splunk-alert-restricted-page-external-sourceip-detection.png](../screenshots/03-splunk-dashboards-and-reports/task-03-alerts/37-splunk-alert-restricted-page-external-sourceip-detection.png) | Built alert-candidate SPL to identify external source IPs accessing `/restricted.html`. |
-| [38-splunk-payments-404-total-count.png](../screenshots/03-splunk-dashboards-and-reports/task-03-alerts/38-splunk-payments-404-total-count.png) | Counted total HTTP 404 responses for `/payments.html`. |
-| [39-splunk-payments-404-hourly-threshold-rule.png](../screenshots/03-splunk-dashboards-and-reports/task-03-alerts/39-splunk-payments-404-hourly-threshold-rule.png) | Built hourly aggregation logic for `/payments.html` 404 responses. |
-| [40-splunk-dashboard-uri-pie-chart-panel.png](../screenshots/03-splunk-dashboards-and-reports/task-04-dashboards/40-splunk-dashboard-uri-pie-chart-panel.png) | Created a dashboard panel visualizing web request distribution by URI. |
-| [41-splunk-dashboard-restricted-status-code-table.png](../screenshots/03-splunk-dashboards-and-reports/task-04-dashboards/41-splunk-dashboard-restricted-status-code-table.png) | Created a dashboard panel summarizing response-code distribution for `/restricted.html`. |
-| [42-splunk-dashboard-sourceip-uri-statuscode-table.png](../screenshots/03-splunk-dashboards-and-reports/task-04-dashboards/42-splunk-dashboard-sourceip-uri-statuscode-table.png) | Created a dashboard panel summarizing web requests by Source_IP, URI, and status_code. |
+| [34 - VPN report search](../screenshots/03-splunk-dashboards-and-reports/task-02-reports/34-splunk-vpn-logins-by-username-report-search.png) | VPN login activity can be summarized by username. |
+| [35 - VPN report view](../screenshots/03-splunk-dashboards-and-reports/task-02-reports/35-splunk-vpn-logins-by-username-report-view.png) | VPN login search was converted into a report view. |
+| [36 - Web connections report](../screenshots/03-splunk-dashboards-and-reports/task-02-reports/36-splunk-web-connections-by-source-ip-report.png) | Web connections can be summarized by source IP. |
+| [37 - Restricted page detection](../screenshots/03-splunk-dashboards-and-reports/task-03-alerts/37-splunk-alert-restricted-page-external-sourceip-detection.png) | Restricted page access can be shaped into alert-candidate logic. |
+| [38 - 404 total count](../screenshots/03-splunk-dashboards-and-reports/task-03-alerts/38-splunk-payments-404-total-count.png) | HTTP 404 activity can be counted. |
+| [39 - 404 hourly threshold](../screenshots/03-splunk-dashboards-and-reports/task-03-alerts/39-splunk-payments-404-hourly-threshold-rule.png) | 404 activity can be shaped into threshold-style review logic. |
+| [40 - URI pie chart panel](../screenshots/03-splunk-dashboards-and-reports/task-04-dashboards/40-splunk-dashboard-uri-pie-chart-panel.png) | URI activity can be visualized in a dashboard panel. |
+| [41 - Restricted status table](../screenshots/03-splunk-dashboards-and-reports/task-04-dashboards/41-splunk-dashboard-restricted-status-code-table.png) | Restricted-path status behavior can be reviewed in a dashboard table. |
+| [42 - Source IP URI status table](../screenshots/03-splunk-dashboards-and-reports/task-04-dashboards/42-splunk-dashboard-sourceip-uri-statuscode-table.png) | Source IP, URI, and status-code activity can be reviewed together. |
 
-## Report and Dashboard Details
+## Reviewer Takeaway
 
-| Item | Value |
-|---|---|
-| VPN report purpose | Recurring review of VPN login volume by user. |
-| Web source IP report purpose | Identify high-volume web source IPs for review and pivots. |
-| Dashboard title | `Web Logs Overview` |
-| Dashboard description | `This dashboard provides an overview of data from the web_logs index.` |
-| URI panel title | `URI Distribution` |
-| URI content title | `Web Requests by URI` |
-| Restricted page panel title | `Restricted Page Status Codes` |
-| Restricted page content title | `Restricted Page Response Breakdown` |
-| Source summary panel title | `Source, URI, and Status Summary` |
-| Source summary content title | `Web Requests by Source IP, URI, and Status` |
+This section demonstrates how SPL work becomes reusable analyst infrastructure.
 
-## Alert-Candidate Scope
+The completed workflow demonstrates a practical SOC skill chain:
 
-The restricted-page search is documented as alert-candidate SPL. This means the search expresses detection logic that could support alerting, but the artifact does not claim a production alert deployment.
-
-This distinction matters because a strong SOC artifact should separate:
-
-- Search logic
-- Dashboard logic
-- Alert-candidate logic
-- Production alert lifecycle and tuning
-
-## Analyst Notes
-
-Reports help standardize repeated review. Dashboards help reduce cognitive load by grouping relevant panels in one place. Alert-candidate searches help document detection thinking before formal deployment.
-
-The restricted-page search demonstrates an important SOC pattern: do not only search for a sensitive URI. Add context. In this case, private IP ranges are excluded so the analyst can focus on external source IPs accessing a restricted resource.
-
-The payment-page 404 workflow demonstrates threshold thinking. Counting total errors is useful, but hourly aggregation gives better context for spikes and alert tuning.
-
-## Related SPL
-
-See:
-
-[03-reports-alerts-dashboards.spl](../spl/03-reports-alerts-dashboards.spl)
+1. Convert repeated searches into reports.
+2. Shape detection conditions into alert-candidate SPL.
+3. Count and threshold error activity.
+4. Build dashboard panels for recurring review.
+5. Make investigation results easier for reviewers and operators to consume.

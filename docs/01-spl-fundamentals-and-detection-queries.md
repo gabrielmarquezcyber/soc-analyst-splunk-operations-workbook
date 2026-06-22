@@ -4,83 +4,127 @@ Previous | [README](../README.md) | [Proof Map](../reviewer-proof-map.md) | [Doc
 
 ## Purpose
 
-This section documents foundational SPL workflows for SOC triage. It starts with basic dataset validation, then moves into field filtering, time-bounded searches, EventID pivots, network field filtering, table output, regex matching, enrichment, lookup context, and anomaly detection.
+This section documents the SPL investigation foundation used throughout the workbook.
 
-The progression mirrors a practical analyst workflow:
+The goal is to show practical search progression: validate searchable data, filter event sets, shape results into analyst-readable tables, enrich events, and build simple anomaly logic.
 
-1. Confirm the dataset is searchable.
-2. Identify high-volume values.
-3. Narrow by time window.
-4. Filter by event type.
-5. Pivot on host, source, destination, and port.
-6. Structure results for readable review.
-7. Add context through enrichment and lookups.
-8. Apply baseline logic for unusual VPN activity.
+## Visual Walkthrough
 
-## Skills Demonstrated
+### 1. Searchable data is validated first
 
-| SPL concept | SOC use |
+Before any investigation logic matters, the analyst has to prove that the relevant dataset exists and can be searched.
+
+<img src="../screenshots/01-splunk-exploring-spl/task-02-search-reporting/01-splunk-windowslogs-base-event-count.png" alt="Base Windows log event count in Splunk" width="850">
+
+The next step is to summarize common source IP values. This turns raw event volume into a reviewable pattern.
+
+<img src="../screenshots/01-splunk-exploring-spl/task-02-search-reporting/02-splunk-top-sourceip-frequency-analysis.png" alt="Top source IP frequency analysis in Splunk" width="850">
+
+Reviewer takeaway: this shows the start of analyst triage: confirm data exists, then summarize fields that matter.
+
+### 2. Filtering narrows raw logs into investigation sets
+
+Once the dataset is searchable, the analyst narrows the search with field filters and compound conditions.
+
+Filtering by Windows Event ID isolates a specific class of activity.
+
+<img src="../screenshots/01-splunk-exploring-spl/task-03-search-operators/04-splunk-eventid-4624-equality-filter.png" alt="Windows Event ID 4624 equality filter in Splunk" width="850">
+
+Compound filtering adds destination IP and port constraints.
+
+<img src="../screenshots/01-splunk-exploring-spl/task-03-search-operators/05-splunk-destinationip-port-compound-filter.png" alt="Destination IP and port compound filter in Splunk" width="850">
+
+Reviewer takeaway: this shows basic SOC search behavior: reduce noise, isolate relevant event types, and pivot by network fields.
+
+### 3. Fields are shaped into analyst-readable results
+
+Raw event views are difficult to review. SPL becomes more useful when the analyst extracts and organizes the fields needed for a decision.
+
+A regex search identifies a target object pattern related to manager values.
+
+<img src="../screenshots/01-splunk-exploring-spl/task-04-filtering-results/09-splunk-regex-targetobject-manager.png" alt="Regex filtering for TargetObject manager values in Splunk" width="850">
+
+Table output turns selected fields into a clean analyst view.
+
+<img src="../screenshots/01-splunk-exploring-spl/task-05-structuring-results/10-splunk-table-account-fields.png" alt="Table output for account fields in Splunk" width="850">
+
+Reviewer takeaway: this shows the transition from raw logs to structured investigation views.
+
+### 4. Process and image activity can be summarized
+
+Analysts often need to identify common processes, suspicious binaries, or unusual execution patterns. This section uses transforming commands to summarize image activity.
+
+<img src="../screenshots/01-splunk-exploring-spl/task-06-transforming-commands/13-splunk-top-image-frequency-analysis.png" alt="Top image frequency analysis in Splunk" width="850">
+
+Reviewer takeaway: this shows the use of aggregation commands to quickly identify common executables or process patterns.
+
+### 5. Enrichment adds context to events
+
+SPL becomes more useful when event data is enriched with additional context.
+
+IP geolocation adds region context to source IP activity.
+
+<img src="../screenshots/01-splunk-exploring-spl/task-06-transforming-commands/14-splunk-iplocation-sourceip-region-enrichment.png" alt="IP location enrichment for source IP values in Splunk" width="850">
+
+Lookup enrichment adds risk context to image values.
+
+<img src="../screenshots/01-splunk-exploring-spl/task-06-transforming-commands/15-splunk-lookup-image-riskscore-enrichment.png" alt="Image risk score lookup enrichment in Splunk" width="850">
+
+Reviewer takeaway: this shows how SPL can move from raw event search to contextualized triage.
+
+### 6. Baseline logic supports anomaly detection
+
+The final step in this section applies simple baseline logic to VPN activity.
+
+Rare country logic compares VPN login geography against observed user activity.
+
+<img src="../screenshots/01-splunk-exploring-spl/task-07-anomaly-detection/16-splunk-vpn-rare-country-outlier-detection.png" alt="Rare VPN country outlier detection in Splunk" width="850">
+
+Login-hour z-score logic looks for unusual access timing.
+
+<img src="../screenshots/01-splunk-exploring-spl/task-07-anomaly-detection/17-splunk-vpn-login-hour-zscore-outlier.png" alt="VPN login hour z-score outlier detection in Splunk" width="850">
+
+Reviewer takeaway: this shows a practical progression from basic searches into detection-oriented analyst logic.
+
+## Supporting Files
+
+| File | Why it matters |
 |---|---|
-| `stats count` | Validate dataset size and event availability. |
-| `stats count by <field>` | Identify high-frequency values for investigation pivots. |
-| `sort - count` | Rank high-volume values. |
-| `head` | Limit review to top results. |
-| `earliest` / `latest` | Narrow analysis to a specific investigation window. |
-| `field=value` filters | Isolate events by attributes such as EventID, host, IP, or port. |
-| wildcard keyword search | Test broad term matching across indexed data. |
-| `fields` | Reduce visible data to investigation-relevant fields. |
-| `table` | Produce analyst-readable output. |
-| `reverse` | Review event order from oldest to newest. |
-| `regex` | Match field patterns such as registry paths or object names. |
-| `top` | Summarize frequent values quickly. |
-| `iplocation` | Add geographic context to source IPs. |
-| `lookup` | Add external risk or context values. |
-| `eventstats` | Calculate behavioral context while preserving event-level detail. |
-| `eval` | Create derived values such as login hour or z-score. |
-| `where` | Filter events based on calculated conditions. |
+| [Section 01 SPL](../spl/01-spl-fundamentals.spl) | Contains the SPL searches used for triage, filtering, structuring, enrichment, and anomaly logic. |
 
-## Evidence Map
+## Complete Evidence Reference
+
+The screenshots embedded above are the most important reviewer-facing proof. The complete evidence set is listed below for full traceability.
 
 | Screenshot | What it proves |
 |---|---|
-| [01-splunk-windowslogs-base-event-count.png](../screenshots/01-splunk-exploring-spl/task-02-search-reporting/01-splunk-windowslogs-base-event-count.png) | Validated basic event counting against the Windows log dataset. |
-| [02-splunk-top-sourceip-frequency-analysis.png](../screenshots/01-splunk-exploring-spl/task-02-search-reporting/02-splunk-top-sourceip-frequency-analysis.png) | Identified high-frequency SourceIp values in Windows event data. |
-| [03-splunk-time-bounded-event-count.png](../screenshots/01-splunk-exploring-spl/task-02-search-reporting/03-splunk-time-bounded-event-count.png) | Counted events inside a narrow investigation window. |
-| [04-splunk-eventid-4624-equality-filter.png](../screenshots/01-splunk-exploring-spl/task-03-search-operators/04-splunk-eventid-4624-equality-filter.png) | Filtered Windows logs by EventID 4624 and counted matching successful-logon events. |
-| [05-splunk-destinationip-port-compound-filter.png](../screenshots/01-splunk-exploring-spl/task-03-search-operators/05-splunk-destinationip-port-compound-filter.png) | Filtered by destination IP and destination port to scope network activity. |
-| [06-splunk-host-destination-sourceip-analysis.png](../screenshots/01-splunk-exploring-spl/task-03-search-operators/06-splunk-host-destination-sourceip-analysis.png) | Combined hostname, destination IP, and SourceIp presence, then aggregated by SourceIp. |
-| [07-splunk-wildcard-keyword-search-cyber.png](../screenshots/01-splunk-exploring-spl/task-03-search-operators/07-splunk-wildcard-keyword-search-cyber.png) | Used wildcard keyword search to validate broad term matching. |
-| [08-splunk-fields-sourceprocessid-filtering.png](../screenshots/01-splunk-exploring-spl/task-04-filtering-results/08-splunk-fields-sourceprocessid-filtering.png) | Used `fields` to narrow visible data and exposed a process ID data-quality issue. |
-| [09-splunk-regex-targetobject-manager.png](../screenshots/01-splunk-exploring-spl/task-04-filtering-results/09-splunk-regex-targetobject-manager.png) | Used regex filtering to identify TargetObject values ending in Manager. |
-| [10-splunk-table-account-fields.png](../screenshots/01-splunk-exploring-spl/task-05-structuring-results/10-splunk-table-account-fields.png) | Structured account-related fields into a readable analyst table. |
-| [11-splunk-reverse-account-event-table.png](../screenshots/01-splunk-exploring-spl/task-05-structuring-results/11-splunk-reverse-account-event-table.png) | Used `reverse` to inspect account activity from oldest to newest. |
-| [12-splunk-process-timeline-a1berto-password-redacted.png](../screenshots/01-splunk-exploring-spl/task-05-structuring-results/12-splunk-process-timeline-a1berto-password-redacted.png) | Reconstructed a process timeline while redacting credential-like material. |
-| [13-splunk-top-image-frequency-analysis.png](../screenshots/01-splunk-exploring-spl/task-06-transforming-commands/13-splunk-top-image-frequency-analysis.png) | Used `top` to identify the most frequent process image. |
-| [14-splunk-iplocation-sourceip-region-enrichment.png](../screenshots/01-splunk-exploring-spl/task-06-transforming-commands/14-splunk-iplocation-sourceip-region-enrichment.png) | Used `iplocation` to enrich SourceIp values with geographic context. |
-| [15-splunk-lookup-image-riskscore-enrichment.png](../screenshots/01-splunk-exploring-spl/task-06-transforming-commands/15-splunk-lookup-image-riskscore-enrichment.png) | Used lookup enrichment to add RiskScore context to process images. |
-| [16-splunk-vpn-rare-country-outlier-detection.png](../screenshots/01-splunk-exploring-spl/task-07-anomaly-detection/16-splunk-vpn-rare-country-outlier-detection.png) | Used per-user country frequency logic to detect rare VPN login geography. |
-| [17-splunk-vpn-login-hour-zscore-outlier.png](../screenshots/01-splunk-exploring-spl/task-07-anomaly-detection/17-splunk-vpn-login-hour-zscore-outlier.png) | Used login-hour z-score logic to identify unusual VPN login timing. |
+| [01 - Base event count](../screenshots/01-splunk-exploring-spl/task-02-search-reporting/01-splunk-windowslogs-base-event-count.png) | Windows log dataset is searchable. |
+| [02 - Source IP frequency](../screenshots/01-splunk-exploring-spl/task-02-search-reporting/02-splunk-top-sourceip-frequency-analysis.png) | Source IP activity can be summarized. |
+| [03 - Time-bounded count](../screenshots/01-splunk-exploring-spl/task-02-search-reporting/03-splunk-time-bounded-event-count.png) | Searches can be constrained by time. |
+| [04 - Event ID 4624 filter](../screenshots/01-splunk-exploring-spl/task-03-search-operators/04-splunk-eventid-4624-equality-filter.png) | Specific Windows event types can be isolated. |
+| [05 - Destination IP and port filter](../screenshots/01-splunk-exploring-spl/task-03-search-operators/05-splunk-destinationip-port-compound-filter.png) | Network fields can be combined for focused filtering. |
+| [06 - Host, destination, source IP analysis](../screenshots/01-splunk-exploring-spl/task-03-search-operators/06-splunk-host-destination-sourceip-analysis.png) | Host and network pivots can be reviewed together. |
+| [07 - Wildcard keyword search](../screenshots/01-splunk-exploring-spl/task-03-search-operators/07-splunk-wildcard-keyword-search-cyber.png) | Keyword and wildcard searching can locate relevant events. |
+| [08 - Field selection](../screenshots/01-splunk-exploring-spl/task-04-filtering-results/08-splunk-fields-sourceprocessid-filtering.png) | Search output can be reduced to relevant fields. |
+| [09 - Regex target object filter](../screenshots/01-splunk-exploring-spl/task-04-filtering-results/09-splunk-regex-targetobject-manager.png) | Regex can locate structured patterns inside event fields. |
+| [10 - Account field table](../screenshots/01-splunk-exploring-spl/task-05-structuring-results/10-splunk-table-account-fields.png) | Results can be shaped into analyst-readable tables. |
+| [11 - Reverse account event table](../screenshots/01-splunk-exploring-spl/task-05-structuring-results/11-splunk-reverse-account-event-table.png) | Table ordering can support review flow. |
+| [12 - Process timeline](../screenshots/01-splunk-exploring-spl/task-05-structuring-results/12-splunk-process-timeline-a1berto-password-redacted.png) | Process activity can be organized into a timeline. |
+| [13 - Image frequency](../screenshots/01-splunk-exploring-spl/task-06-transforming-commands/13-splunk-top-image-frequency-analysis.png) | Transforming commands can summarize process image frequency. |
+| [14 - IP geolocation enrichment](../screenshots/01-splunk-exploring-spl/task-06-transforming-commands/14-splunk-iplocation-sourceip-region-enrichment.png) | Source IPs can be enriched with region context. |
+| [15 - Risk-score lookup enrichment](../screenshots/01-splunk-exploring-spl/task-06-transforming-commands/15-splunk-lookup-image-riskscore-enrichment.png) | Lookup files can add risk context to events. |
+| [16 - Rare VPN country outlier](../screenshots/01-splunk-exploring-spl/task-07-anomaly-detection/16-splunk-vpn-rare-country-outlier-detection.png) | User VPN country activity can be baselined for outlier review. |
+| [17 - Login-hour z-score outlier](../screenshots/01-splunk-exploring-spl/task-07-anomaly-detection/17-splunk-vpn-login-hour-zscore-outlier.png) | Login timing can be reviewed with z-score logic. |
 
-## Analyst Notes
+## Reviewer Takeaway
 
-The early searches establish a foundation: count the data, inspect common values, narrow by time, and filter by important fields. This matters because a SOC analyst should not jump straight into complex detection logic before confirming that the dataset, fields, and investigation window are correct.
+This section demonstrates the core SPL investigation loop:
 
-The middle portion focuses on making event data readable. `fields`, `table`, `reverse`, and `regex` help turn raw events into structured investigation views. This is the difference between having logs and being able to review them under time pressure.
+1. Validate searchable data.
+2. Filter to relevant event sets.
+3. Shape raw events into readable tables.
+4. Summarize process and network activity.
+5. Enrich events with context.
+6. Apply simple baseline logic for anomaly review.
 
-The final portion introduces enrichment and anomaly logic. `iplocation`, `lookup`, `eventstats`, `eval`, and `where` show how raw events can be enriched, baselined, and filtered into higher-signal results.
-
-## Data Quality Lesson
-
-One field-selection task exposed a practical SPL issue: fields that look numeric may contain mixed formats, such as decimal and hex-like values. Before relying on sort order, analysts should validate field format and type assumptions.
-
-This matters in real triage because incorrect assumptions about field types can change which values appear most important.
-
-## Public Safety Note
-
-The process timeline screenshot was redacted before publication because the original command line contained credential-like material. The public artifact preserves the process relationship and timeline evidence without exposing the sensitive value.
-
-## Related SPL
-
-See:
-
-[01-spl-fundamentals.spl](../spl/01-spl-fundamentals.spl)
+This is the SPL foundation that supports the later ingestion, dashboarding, parsing, and network-log analysis sections.
