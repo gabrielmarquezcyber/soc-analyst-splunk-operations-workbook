@@ -8,13 +8,13 @@ It maps each section to the exact proof a reviewer should inspect: section guide
 
 Start with the screenshot-driven visual page if you want the fastest human-readable view of the artifact:
 
-- [Visual Walkthrough](docs/visual-walkthrough.md)
+- [Main Visual README](README.md)
 
 ## Fastest Review Order
 
 | Priority | What to review | Why it matters |
 |---|---|---|
-| 1 | [Visual Walkthrough](docs/visual-walkthrough.md) | Screenshot-driven narrative showing the workbook as a reviewer-friendly investigation story. |
+| 1 | [Main Visual README](README.md) | Screenshot-driven narrative showing the workbook as a reviewer-friendly investigation story. |
 | 2 | [Section 04 - Data Parsing, Normalization, and Field Extraction](docs/04-data-parsing-normalization-and-field-extraction.md) | Strongest proof of Splunk configuration depth: event breaking, multiline parsing, masking, transforms, fields, and validation. |
 | 3 | [Section 05 - Applied Parsing Fix and Network Log Analysis](docs/05-applied-parsing-fix-and-network-log-analysis.md) | Shows broken-log diagnosis, parsing repair, custom field extraction, and structured network analysis. |
 | 4 | [Section 01 - SPL Fundamentals and Detection Queries](docs/01-spl-fundamentals-and-detection-queries.md) | Shows SPL triage progression from basic searches to enrichment and anomaly logic. |

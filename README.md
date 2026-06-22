@@ -4,67 +4,177 @@ Splunk SOC operations workbook covering SPL triage, log ingestion, reports, dash
 
 This repository is a reviewer-facing proof artifact for SOC, MDR, SIEM, detection analyst, and security operations roles. It demonstrates practical Splunk analyst workflows across search, ingestion, dashboarding, parsing configuration, and investigation validation.
 
-## Start Here
+This README is the primary review path. It presents the work as a visual evidence narrative first, then links each section to the full technical references.
+
+This walkthrough shows the SOC Analyst Splunk Operations Workbook as a visual investigation story. The goal is to make the evidence readable to a reviewer who may not want to inspect every SPL query or configuration file first.
+
+The full technical details are available in the section guides, SPL files, and Splunk configuration files. This page highlights the most reviewer-friendly proof.
+
+## 1. SPL Triage Starts With Searchable Evidence
+
+A Splunk analyst first needs to prove that the dataset is searchable, then narrow the view using fields, time windows, filters, tables, enrichment, and baseline logic.
+
+The workbook begins with foundational SPL triage and progresses into anomaly-style reasoning.
+
+<img src="screenshots/01-splunk-exploring-spl/task-07-anomaly-detection/16-splunk-vpn-rare-country-outlier-detection.png" alt="Rare VPN country outlier detection in Splunk" width="850">
+
+This search uses per-user country frequency to identify unusual VPN login geography. The point is not just to count events, but to compare activity against the user baseline.
+
+<img src="screenshots/01-splunk-exploring-spl/task-07-anomaly-detection/17-splunk-vpn-login-hour-zscore-outlier.png" alt="VPN login hour z-score outlier detection in Splunk" width="850">
+
+The z-score search extends that idea by looking for unusual login timing. This shows the transition from basic SPL to analyst logic that can support investigation.
+
+Supporting files:
+
+- [Section 01 guide](docs/01-spl-fundamentals-and-detection-queries.md)
+- [Section 01 SPL](spl/01-spl-fundamentals.spl)
+
+## 2. Log Ingestion Must Be Proven Before Analysis
+
+Before reports or detections matter, the analyst has to prove that Splunk is receiving the right data with the right metadata.
+
+This workbook validates service status, receiving configuration, forwarder flow, index creation, monitored inputs, and searchable log ingestion.
+
+<img src="screenshots/02-splunk-setting-up-soc-lab/task-06-configuring-forwarder/23-splunk-receiving-port-9997-enabled.png" alt="Splunk receiving port 9997 enabled" width="850">
+
+Splunk receiving on port `9997` is the foundation for forwarding data into the indexer.
+
+<img src="screenshots/02-splunk-setting-up-soc-lab/task-06-configuring-forwarder/27-splunk-authlog-ingestion-sourcetype-validation.png" alt="Linux authentication log ingestion validation in Splunk" width="850">
+
+The auth log validation proves that Linux authentication data is searchable with useful source, sourcetype, host, and index context.
+
+<img src="screenshots/02-splunk-setting-up-soc-lab/task-08-ingesting-web-logs/30-splunk-web-accesslog-ingestion-validation.png" alt="Apache access log ingestion validation in Splunk" width="850">
+
+The web log validation proves that Apache access logs were onboarded and can support URI, source, status, and web activity review.
+
+Supporting files:
+
+- [Section 02 guide](docs/02-splunk-lab-deployment-and-log-ingestion.md)
+- [Section 02 SPL](spl/02-ingestion-validation.spl)
+
+## 3. Recurring Review Becomes Reports, Alert Logic, and Dashboards
+
+Once data is searchable, repeated questions should become reusable Splunk assets. This section shows reports, alert-candidate logic, and dashboard panels.
+
+<img src="screenshots/03-splunk-dashboards-and-reports/task-03-alerts/37-splunk-alert-restricted-page-external-sourceip-detection.png" alt="Restricted page external source IP detection logic in Splunk" width="850">
+
+This search focuses on external source IPs accessing a restricted URI. It demonstrates alert-candidate logic without overstating production alert deployment.
+
+<img src="screenshots/03-splunk-dashboards-and-reports/task-04-dashboards/42-splunk-dashboard-sourceip-uri-statuscode-table.png" alt="Splunk dashboard panel summarizing source IP, URI, and status code" width="850">
+
+The dashboard evidence shows how raw search results can be turned into a recurring review surface for source IP, URI, and status-code activity.
+
+Supporting files:
+
+- [Section 03 guide](docs/03-reports-alerts-and-dashboards.md)
+- [Section 03 SPL](spl/03-reports-alerts-dashboards.spl)
+
+## 4. Broken Parsing Is Repaired With Splunk Configuration
+
+This is the strongest technical section of the workbook. It shows that the artifact is not only search usage. It includes Splunk parsing mechanics: `inputs.conf`, `props.conf`, `transforms.conf`, `fields.conf`, event boundaries, multiline handling, masking, and field extraction.
+
+First, the workbook captures broken event boundaries.
+
+<img src="screenshots/04-splunk-data-manipulation/task-06-event-boundaries/48-splunk-vpnlogs-broken-event-boundaries-before-fix.png" alt="Broken VPN log event boundaries before Splunk parsing fix" width="850">
+
+Then it shows the repair using `props.conf`.
+
+<img src="screenshots/04-splunk-data-manipulation/task-06-event-boundaries/49-splunk-vpnlogs-props-conf-event-boundary-rule.png" alt="Splunk props.conf event boundary rule for VPN logs" width="850">
+
+The repaired result is validated in Splunk search.
+
+<img src="screenshots/04-splunk-data-manipulation/task-06-event-boundaries/50-splunk-vpnlogs-fixed-event-boundary-validation.png" alt="Fixed VPN log event boundaries validated in Splunk" width="850">
+
+The workbook also demonstrates masking of credit-card-like values before publishing evidence.
+
+<img src="screenshots/04-splunk-data-manipulation/task-08-masking-sensitive-data/57-splunk-purchaselogs-props-conf-sedcmd-masking-rule.png" alt="SEDCMD masking rule in Splunk props.conf" width="850">
+
+The masked result is then validated.
+
+<img src="screenshots/04-splunk-data-manipulation/task-08-masking-sensitive-data/58-splunk-purchaselogs-masked-validation.png" alt="Masked purchase log validation in Splunk" width="850">
+
+Finally, custom fields are extracted and shown as searchable analyst fields.
+
+<img src="screenshots/04-splunk-data-manipulation/task-09-custom-field-extraction/62-splunk-vpn-custom-field-extraction-validation.png" alt="VPN custom field extraction validation in Splunk" width="850">
+
+Supporting files:
+
+- [Section 04 guide](docs/04-data-parsing-normalization-and-field-extraction.md)
+- [DataApp inputs.conf](configs/dataapp/inputs.conf)
+- [DataApp props.conf](configs/dataapp/props.conf)
+- [DataApp transforms.conf](configs/dataapp/transforms.conf)
+- [DataApp fields.conf](configs/dataapp/fields.conf)
+- [Section 04 SPL](spl/04-data-manipulation-validation.spl)
+
+## 5. Repaired Network Logs Become Analyst-Ready Results
+
+The final section applies the parsing workflow to broken network-log data. The result is a structured dataset that can answer investigation questions about users, departments, domains, URIs, source IPs, countries, and sensitive-looking document access.
+
+The initial evidence shows broken network events.
+
+<img src="screenshots/05-splunk-fixit-challenge/task-02-fixit-challenge/68-splunk-fixit-initial-broken-events.png" alt="Initial broken network log events in Splunk" width="850">
+
+The parsing repair is then expressed through Splunk configuration.
+
+<img src="screenshots/05-splunk-fixit-challenge/task-02-fixit-challenge/70-splunk-fixit-props-conf-event-boundary-fix.png" alt="Network log event boundary repair in props.conf" width="850">
+
+Custom fields are extracted from the network logs.
+
+<img src="screenshots/05-splunk-fixit-challenge/task-02-fixit-challenge/71-splunk-fixit-transforms-conf-custom-fields.png" alt="Network log custom fields in transforms.conf" width="850">
+
+The corrected field extraction is validated in Splunk.
+
+<img src="screenshots/05-splunk-fixit-challenge/task-02-fixit-challenge/74-splunk-fixit-fixed-field-extraction-validation.png" alt="Fixed network log field extraction validation in Splunk" width="850">
+
+The final result is an analyst-ready network activity summary.
+
+<img src="screenshots/05-splunk-fixit-challenge/task-02-fixit-challenge/75-splunk-fixit-network-analysis-summary.png" alt="Network log analysis summary in Splunk" width="850">
+
+Supporting files:
+
+- [Section 05 guide](docs/05-applied-parsing-fix-and-network-log-analysis.md)
+- [Fixit inputs.conf](configs/fixit/inputs.conf)
+- [Fixit props.conf](configs/fixit/props.conf)
+- [Fixit transforms.conf](configs/fixit/transforms.conf)
+- [Fixit fields.conf](configs/fixit/fields.conf)
+- [Section 05 SPL](spl/05-fixit-analysis.spl)
+
+## Reviewer Takeaway
+
+This workbook demonstrates more than isolated searches. It shows a complete Splunk analyst progression:
+
+1. Search and triage data.
+2. Validate ingestion.
+3. Build reusable reports and dashboard panels.
+4. Diagnose broken parsing.
+5. Repair event structure.
+6. Mask sensitive values.
+7. Extract analyst-useful fields.
+8. Validate fields with SPL.
+9. Use repaired data for network-log analysis.
+
+
+
+
+## Reference Hubs
 
 | Reviewer path | Link |
 |---|---|
-| Visual walkthrough | [Visual Walkthrough](docs/visual-walkthrough.md) |
-| Proof map | [Reviewer Proof Map](reviewer-proof-map.md) |
-| Section guides | [docs/](docs/) |
+| Reviewer proof map | [Reviewer Proof Map](reviewer-proof-map.md) |
+| Section guide index | [docs/](docs/) |
 | SPL searches | [spl/](spl/) |
 | Splunk configuration files | [configs/](configs/) |
-| Screenshot evidence | [screenshots/](screenshots/) |
+| Screenshot evidence archive | [screenshots/](screenshots/) |
 
-## Fast Review Path
+## Full Reference Index
 
-For a quick review, follow this order:
-
-1. [Visual Walkthrough](docs/visual-walkthrough.md)
-2. [Reviewer Proof Map](reviewer-proof-map.md)
-3. [Section 04 - Data Parsing, Normalization, and Field Extraction](docs/04-data-parsing-normalization-and-field-extraction.md)
-4. [Section 05 - Applied Parsing Fix and Network Log Analysis](docs/05-applied-parsing-fix-and-network-log-analysis.md)
-5. [Section 01 - SPL Fundamentals and Detection Queries](docs/01-spl-fundamentals-and-detection-queries.md)
-6. [SPL Validation Searches](spl/)
-7. [Splunk Configuration Files](configs/)
-
-## What This Proves
-
-| Capability | Evidence |
-|---|---|
-| SPL triage and investigation pivots | [Section 01](docs/01-spl-fundamentals-and-detection-queries.md), [01 SPL file](spl/01-spl-fundamentals.spl) |
-| Splunk deployment and log ingestion validation | [Section 02](docs/02-splunk-lab-deployment-and-log-ingestion.md), [02 SPL file](spl/02-ingestion-validation.spl) |
-| Reports, dashboard panels, and alert-candidate logic | [Section 03](docs/03-reports-alerts-and-dashboards.md), [03 SPL file](spl/03-reports-alerts-dashboards.spl) |
-| Event breaking, multiline parsing, masking, and field extraction | [Section 04](docs/04-data-parsing-normalization-and-field-extraction.md), [DataApp configs](configs/dataapp/) |
-| Applied broken-log repair and network activity analysis | [Section 05](docs/05-applied-parsing-fix-and-network-log-analysis.md), [Fixit configs](configs/fixit/) |
-
-## Workbook Sections
-
-| Section | Focus | Guide | Evidence |
+| Area | Guide | Technical files | Screenshot evidence |
 |---|---|---|---|
-| 01 | SPL fundamentals, filtering, enrichment, anomaly logic | [Guide](docs/01-spl-fundamentals-and-detection-queries.md) | [Screenshots 01-17](screenshots/01-splunk-exploring-spl/) |
-| 02 | Splunk deployment, forwarder setup, log ingestion | [Guide](docs/02-splunk-lab-deployment-and-log-ingestion.md) | [Screenshots 18-33](screenshots/02-splunk-setting-up-soc-lab/) |
-| 03 | Reports, alerts, dashboards, recurring review | [Guide](docs/03-reports-alerts-and-dashboards.md) | [Screenshots 34-42](screenshots/03-splunk-dashboards-and-reports/) |
-| 04 | App-scoped parsing, SEDCMD masking, custom fields | [Guide](docs/04-data-parsing-normalization-and-field-extraction.md) | [Screenshots 43-67](screenshots/04-splunk-data-manipulation/) |
-| 05 | Broken network-log repair and structured analysis | [Guide](docs/05-applied-parsing-fix-and-network-log-analysis.md) | [Screenshots 68-75](screenshots/05-splunk-fixit-challenge/) |
-
-## Technical Assets
-
-### SPL Searches
-
-| File | Purpose |
-|---|---|
-| [01-spl-fundamentals.spl](spl/01-spl-fundamentals.spl) | SPL triage, filtering, enrichment, and anomaly searches. |
-| [02-ingestion-validation.spl](spl/02-ingestion-validation.spl) | Linux auth log and Apache access log ingestion validation. |
-| [03-reports-alerts-dashboards.spl](spl/03-reports-alerts-dashboards.spl) | Report searches, dashboard panels, and alert-candidate logic. |
-| [04-data-manipulation-validation.spl](spl/04-data-manipulation-validation.spl) | Parsing, masking, and field extraction validation searches. |
-| [05-fixit-analysis.spl](spl/05-fixit-analysis.spl) | Network-log field validation and final analysis summary. |
-
-### Splunk Configuration
-
-| Folder | Purpose |
-|---|---|
-| [configs/dataapp/](configs/dataapp/) | Scripted inputs, event boundaries, multiline handling, masking, and field extraction for DataApp sourcetypes. |
-| [configs/fixit/](configs/fixit/) | Scripted input, event boundary repair, field extraction, and indexed-field registration for network logs. |
+| SPL triage and anomaly logic | [Section 01](docs/01-spl-fundamentals-and-detection-queries.md) | [01-spl-fundamentals.spl](spl/01-spl-fundamentals.spl) | [Screenshots 01-17](screenshots/01-splunk-exploring-spl/) |
+| Splunk deployment and ingestion | [Section 02](docs/02-splunk-lab-deployment-and-log-ingestion.md) | [02-ingestion-validation.spl](spl/02-ingestion-validation.spl) | [Screenshots 18-33](screenshots/02-splunk-setting-up-soc-lab/) |
+| Reports, alerts, dashboards | [Section 03](docs/03-reports-alerts-and-dashboards.md) | [03-reports-alerts-dashboards.spl](spl/03-reports-alerts-dashboards.spl) | [Screenshots 34-42](screenshots/03-splunk-dashboards-and-reports/) |
+| Parsing, masking, field extraction | [Section 04](docs/04-data-parsing-normalization-and-field-extraction.md) | [DataApp configs](configs/dataapp/), [04 SPL validation](spl/04-data-manipulation-validation.spl) | [Screenshots 43-67](screenshots/04-splunk-data-manipulation/) |
+| Applied network-log repair | [Section 05](docs/05-applied-parsing-fix-and-network-log-analysis.md) | [Fixit configs](configs/fixit/), [05 SPL analysis](spl/05-fixit-analysis.spl) | [Screenshots 68-75](screenshots/05-splunk-fixit-challenge/) |
 
 ## Public Safety and Scope
 

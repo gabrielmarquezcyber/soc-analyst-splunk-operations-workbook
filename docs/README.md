@@ -1,14 +1,14 @@
 # Splunk Workbook Section Index
 
-[README](../README.md) | [Proof Map](../reviewer-proof-map.md) | [Visual Walkthrough](visual-walkthrough.md)
+[README](../README.md) | [Proof Map](../reviewer-proof-map.md) | [Main Visual README](../README.md)
 
 This folder contains the five reviewer-facing section guides for the SOC Analyst Splunk Operations Workbook.
 
-## Visual Walkthrough
+## Main Visual README
 
 For the most reviewer-friendly path, start here:
 
-- [Visual Walkthrough](visual-walkthrough.md)
+- [Main Visual README](../README.md)
 
 ## Recommended Review Order
 
