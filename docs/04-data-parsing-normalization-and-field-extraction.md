@@ -1,5 +1,7 @@
 # Section 04 - Splunk Data Parsing, Normalization, and Field Extraction
 
+[Previous](./03-reports-alerts-and-dashboards.md) | [README](../README.md) | [Proof Map](../reviewer-proof-map.md) | [Docs Index](README.md) | [Next](./05-applied-parsing-fix-and-network-log-analysis.md)
+
 ## Purpose
 
 This section documents Splunk data manipulation work that turns poorly structured scripted-input data into searchable, analyst-ready events.

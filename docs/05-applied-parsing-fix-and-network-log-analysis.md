@@ -1,5 +1,7 @@
 # Section 05 - Applied Splunk Parsing Fix and Network Log Analysis
 
+[Previous](./04-data-parsing-normalization-and-field-extraction.md) | [README](../README.md) | [Proof Map](../reviewer-proof-map.md) | [Docs Index](README.md) | Next
+
 ## Purpose
 
 This section documents an applied parsing repair workflow for broken network-log data. The goal is to show how an analyst can diagnose unusable events, repair parsing with Splunk configuration, extract custom fields, validate the result, and then answer investigation questions from structured data.

@@ -1,5 +1,7 @@
 # Section 01 - SPL Fundamentals and Detection Queries
 
+Previous | [README](../README.md) | [Proof Map](../reviewer-proof-map.md) | [Docs Index](README.md) | [Next](./02-splunk-lab-deployment-and-log-ingestion.md)
+
 ## Purpose
 
 This section documents foundational SPL workflows for SOC triage. It starts with basic dataset validation, then moves into field filtering, time-bounded searches, EventID pivots, network field filtering, table output, regex matching, enrichment, lookup context, and anomaly detection.

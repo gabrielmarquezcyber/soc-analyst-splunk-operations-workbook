@@ -1,5 +1,7 @@
 # Section 03 - Reports, Alerts, and Dashboards
 
+[Previous](./02-splunk-lab-deployment-and-log-ingestion.md) | [README](../README.md) | [Proof Map](../reviewer-proof-map.md) | [Docs Index](README.md) | [Next](./04-data-parsing-normalization-and-field-extraction.md)
+
 ## Purpose
 
 This section documents how recurring SOC questions can be converted into reusable Splunk reports, alert-candidate SPL, and dashboard panels.

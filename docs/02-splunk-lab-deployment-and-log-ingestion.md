@@ -1,4 +1,6 @@
-﻿# Section 02 - Splunk Lab Deployment and Log Ingestion
+# Section 02 - Splunk Lab Deployment and Log Ingestion
+
+[Previous](./01-spl-fundamentals-and-detection-queries.md) | [README](../README.md) | [Proof Map](../reviewer-proof-map.md) | [Docs Index](README.md) | [Next](./03-reports-alerts-and-dashboards.md)
 
 ## Purpose
 
@@ -94,4 +96,3 @@ The sensitive-looking web path validation does not publish page content. It only
 See:
 
 [02-ingestion-validation.spl](../spl/02-ingestion-validation.spl)
-
