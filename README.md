@@ -8,6 +8,7 @@ This repository is a reviewer-facing proof artifact for SOC, MDR, SIEM, detectio
 
 | Reviewer path | Link |
 |---|---|
+| Visual walkthrough | [Visual Walkthrough](docs/visual-walkthrough.md) |
 | Proof map | [Reviewer Proof Map](reviewer-proof-map.md) |
 | Section guides | [docs/](docs/) |
 | SPL searches | [spl/](spl/) |
@@ -18,12 +19,13 @@ This repository is a reviewer-facing proof artifact for SOC, MDR, SIEM, detectio
 
 For a quick review, follow this order:
 
-1. [Reviewer Proof Map](reviewer-proof-map.md)
-2. [Section 04 - Data Parsing, Normalization, and Field Extraction](docs/04-data-parsing-normalization-and-field-extraction.md)
-3. [Section 05 - Applied Parsing Fix and Network Log Analysis](docs/05-applied-parsing-fix-and-network-log-analysis.md)
-4. [Section 01 - SPL Fundamentals and Detection Queries](docs/01-spl-fundamentals-and-detection-queries.md)
-5. [SPL Validation Searches](spl/)
-6. [Splunk Configuration Files](configs/)
+1. [Visual Walkthrough](docs/visual-walkthrough.md)
+2. [Reviewer Proof Map](reviewer-proof-map.md)
+3. [Section 04 - Data Parsing, Normalization, and Field Extraction](docs/04-data-parsing-normalization-and-field-extraction.md)
+4. [Section 05 - Applied Parsing Fix and Network Log Analysis](docs/05-applied-parsing-fix-and-network-log-analysis.md)
+5. [Section 01 - SPL Fundamentals and Detection Queries](docs/01-spl-fundamentals-and-detection-queries.md)
+6. [SPL Validation Searches](spl/)
+7. [Splunk Configuration Files](configs/)
 
 ## What This Proves
 
