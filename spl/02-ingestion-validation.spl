@@ -1,4 +1,4 @@
-# SOC Analyst Splunk Operations Workbook
+﻿# SOC Analyst Splunk Operations Workbook
 # Section 02 - Splunk Lab Deployment and Log Ingestion
 
 # Validate Linux auth log ingestion
@@ -22,6 +22,7 @@ index=web source="/var/log/apache2/access.log"
 index=web source="/var/log/apache2/access.log" uri_path="/images/coffeerecipes/cappuchino.png"
 | table _time host source sourcetype uri_path status
 
-# Validate access to a sensitive-looking path without exposing flag content
+# Validate access to a sensitive-looking path without exposing page content
 index=web source="/var/log/apache2/access.log" uri_path="/secret-flag.html"
 | table _time host source sourcetype uri_path status
+

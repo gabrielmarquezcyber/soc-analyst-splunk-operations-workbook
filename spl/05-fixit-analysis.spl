@@ -1,4 +1,4 @@
-# SOC Analyst Splunk Operations Workbook
+﻿# SOC Analyst Splunk Operations Workbook
 # Section 05 - Applied Parsing Fix and Network Log Analysis
 
 # Validate network_logs custom field extraction
@@ -26,7 +26,7 @@ index=main sourcetype=network_logs source=networks earliest=-10m
     dc(IPRange) as unique_IP_ranges
     values(eval(if(URI="/secret-document.pdf", Username, null()))) as secret_document_User
 
-# Room-aligned private IP range grouping
+# Private IP range grouping used for validated range-family count
 index=main sourcetype=network_logs source=networks
 | eval IPRange=case(
     like(SourceIP,"10.%"), "10.x.x.x",
@@ -34,3 +34,4 @@ index=main sourcetype=network_logs source=networks
     like(SourceIP,"192.168.%"), "192.168.x.x"
 )
 | stats count by IPRange
+
